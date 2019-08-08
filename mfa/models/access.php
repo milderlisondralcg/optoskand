@@ -22,21 +22,12 @@ class Access extends Database {
 		$stmt-> bindValue(':Get_access_Key',trim($my_access_key), PDO::PARAM_STR);
 		$stmt-> execute();	
 		$result = $stmt->fetch(PDO::FETCH_ASSOC);
-		
-		//return  $result['id_portal_keys'];
+
 		if( $stmt->rowCount() == 1 ){
 			return true;
 		}else{
 			return false;
 		}
-		//return $result;
-		
-		/*if( count($result) > 0 ){
-	
-			 . $access_key;
-		}else{
-			return 'bad' . $result . $access_key;
-		}	*/
 	}
 
 	/**
@@ -95,17 +86,9 @@ class Access extends Database {
 				return true;
 			}
 		}
-		/*
-		$stmt->execute();
-		$number_of_rows = $stmt->fetchColumn();
-		return $number_of_rows;
-		*/
 					
 	}
-
 	
 }
-
-
 
 ?>
