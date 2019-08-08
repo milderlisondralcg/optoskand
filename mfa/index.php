@@ -4,7 +4,6 @@ require( "sendgrid/sendgrid-php.php" );
 
 spl_autoload_register('mmAutoloader');
 function mmAutoloader($className){
-    //$path = 'D:/home/site/wwwroot/App_Constant/mfa/models/';
 	$path = '../../App_Constant/mfa/models/';
     include $path.$className.'.php';
 }
@@ -33,10 +32,7 @@ switch($action){
 			$access_uuid_1 = getToken(25);
 			$_POST['access_uuid_1'] = $access_uuid_1;
 			$add_result = $access->add($_POST);
-			
-			//$emailKeyLink = "https://cohrstage.coherent.com/mfa?key=123"; // . $authkey . "&r=" . $referrer;
 
-			//$emailKeyLink = "https://" . $_SERVER['SERVER_NAME'] . "/App_Constant/optoskand-landing.html?key=" . $access_uuid_1;
 			$emailKeyLink = "https://" . $_SERVER['SERVER_NAME'] . "/support/customer_portal/optoskand/?key=" . $access_uuid_1;
 			
 			// create html message
@@ -94,7 +90,6 @@ switch($action){
 		}
 
 		$response['valid'] = $valid;
-		//$response['id'] = $id;
 		break;
 	case "check_cookie_exists":
 			$valid = false;
@@ -110,7 +105,6 @@ switch($action){
 
 }
 
-//$response = array("result"=>$result,"sendgrid"=>getenv( 'SENDGRID_API_KEY' ));
 print json_encode($response);
 
 
