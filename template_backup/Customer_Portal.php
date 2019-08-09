@@ -110,25 +110,19 @@ foreach ($_COOKIE as $key=>$val)
 		</div>
 		--} 
     </div>
-    <div class="summary">
+    <div class="summary customer_portal">
 	  <div id="notification"></div>
       <div class="" style="max-width:100%;width:100%;display:none;" id="passcode_form_contaner">
           <form id="passcode_form" name="passcode_form" method="post">
-              <label for="Company">email *</label>
-              <input id="email" type="email" name="email" maxlength="100"  value="" required>
-
-              <label for="passcode">passcode *</label>
-              <input id="passcode" type="Text" name="passcode" maxlength="200"value="" required>
-              <!-- <input type="hidden" name="XID" value="{XID_HASH}" /> -->
+              <input id="email" type="email" name="email" maxlength="100"  value="" placeholder="Email *" required>
+              <input id="passcode" type="Text" name="passcode" maxlength="200"value="" placeholder="Passcode *" required>
               <input type="hidden" name="action" value="validate_passcode">
 			  <input type="hidden" name="category" id="category" value="{support_main_title}">
-              <input type="submit" value="Submit" name="submit">
+			  <input type="submit" class="reg-button" value="Submit" name="submit">
           <form>
       </div>
 	  <div id="media"></div>
-      <?php //include($_ENV["path_to_support"] . "_customer_portal_resources.php")?>
     </div>
-    <?php //include($_ENV["path_to_support"] . "_customer_portal_filter_script.html")?>
   </div>
   <!--  END Right  --> 
 </div>
@@ -150,15 +144,10 @@ include($_ENV["path_to_includes"] . "\_static_footer.html");
 	var controller = '/App_Constant/mfa/';
 	$(document).ready(function(){
 		// Check to see if browser has a valid Cookie
-		//$.get( controller, { action: "check_cookie_exists" }, function( data ){
-			//if( data.valid == true ){
-				//$("#media").load("/App_Constant/optoskand.html");
-				//$("#passcode_form_contaner").hide();		
-			//}else{
 				var key = getUrlVars()["key"];
 				
 				if (typeof key === 'undefined' || key === null) { 
-					$("#notification").html("Please submit your email address and the passcode that was given to you buy our Support Staff");
+					$("#notification").html("Please submit your email address and the passcode that was given to you by our Support Staff");
 					$("#passcode_form_contaner").show();
 				}else{				
 					//check for existing cookie
@@ -173,18 +162,11 @@ include($_ENV["path_to_includes"] . "\_static_footer.html");
 							});
 							$("#passcode_form_contaner").hide();
 						}else{ 
-							$("#notification").html("Please submit your email address and the passcode that was given to you buy our Support Staff");
-							//if (typeof key === undefined || key === null) { console.log("undefined");
-								//$("#notification").html("Please submit your email address and the passcode that was given to you buy our Support Staff");
-							//}
+							$("#notification").html("Please submit your email address and the passcode that was given to you by our Support Staff");							
 							$("#passcode_form_contaner").show();
 						}
 					}, "json" );
-				}		
-			//}
-		//},"json");
-		
-	
+				}
 	});
 	
 	$("#passcode_form").submit(function(event){
