@@ -1,1 +1,1 @@
-# optoskand
+This code base is part of a process that allows potential organization customers to register for a portal that contains detailed information for specific product companies. This project is a combination of Php and Javascript integrated with ExpressionEngine.
