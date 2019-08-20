@@ -1,6 +1,6 @@
 <?php
 session_start();
-error_reporting(E_ALL);
+error_reporting(0);
 spl_autoload_register('mmAutoloader');
 
 function mmAutoloader($className){
@@ -72,21 +72,8 @@ switch($action){
 			$data['source_container'] = $media_info['Folder'];
 			$data['source_blob'] = $media_info['SavedMedia'];
 			$data['destination_blob'] = time() . "-" . $media_info['SavedMedia'];
-			/*
-				switch($media_info['Folder']){
-					case "file":
-						$data['destination_container'] = "file-archive";
-						break;
-					case "assets":
-						$data['destination_container'] = "assets-archive";
-						break;
-					case "m-lmc":
-						$data['destination_container'] = "m-lmc-archive";
-						break;								
-				}
-				*/
-				$data['destination_container'] = $media_info['Folder'] . '-archive';
-				extract($data);
+			$data['destination_container'] = $media_info['Folder'] . '-archive';
+			extract($data);
 
 			copy_media($data);
 			delete_media($data);
@@ -110,21 +97,6 @@ switch($action){
 				$all_links = '<a href="'.$direct_link_to_file.'" target="_blank">'.$direct_link_to_file.'</a> ( CDN - Use This )<br/><br/>';
 				$all_links .= '<a href="'.$public_link_to_file.'" target="_blank">'.$public_link_to_file.'</a> ( Special Relative Link )';
 				$last_modified = date("m/d/Y", strtotime($CreatedDateTime)); // friendly date and time format
-				/*
-				switch($Folder){
-					case "file":
-						$Category = "File";
-						break;
-					case "assets":
-						$Category = "Assets";
-						break;
-					case "emailer":
-						$Category = "Emailer";
-						break;
-					case "m-lmc":
-						$Category = "M-LMC";
-						break;						
-				}*/
 				$all_media[] = array("DT_RowId"=>$MediaID,"Title"=>$Title,"Category"=>$Category,"Description"=>$Description,"LinkToFile"=>$all_links,"LastModified"=>$last_modified,"Tags"=>$Tags,"ActionDelete"=>"Archive","ActionEdit"=>"Edit","Folder"=>ucfirst($Folder));
 			}
 			print json_encode(array("data"=>$all_media));		
@@ -181,10 +153,6 @@ switch($action){
 								$title_temp = strtolower($_POST['Title']);
 								$title_temp = preg_replace('/[^a-zA-Z0-9\']/', '-', $title_temp); // remove special characters
 								$title_temp = str_replace("'", '', $title_temp); // remove apostrophes
-									
-								/* if(substr($title_temp,-1,1) == "-"){
-									$title_temp = substr($title_temp,0,strlen($title_temp) - 1);
-								} */
 								$title_temp = trim(preg_replace('/-+/', '-', $title_temp), '-'); // remove double dash and trailing dash
 
 								
@@ -212,7 +180,6 @@ switch($action){
 			}	
 		break;
 	case "add_video":
-		print_r($_FILES);
 		if($_FILES){
 			$num_files_sent = count($_FILES['file_upload']['name']);
 			for( $i=0; $i<=$num_files_sent; $i++ ){
