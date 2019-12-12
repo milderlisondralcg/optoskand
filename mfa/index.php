@@ -30,10 +30,13 @@ switch($action){
 		if( $result === true){
 			// Add new record for user's email and given passcode
 			$access_uuid_1 = getToken(25);
+			$category = $_POST['category'];
+			setcookie("COHR-OPTOSKAND",$access_uuid_1, time()+86400);
 			$_POST['access_uuid_1'] = $access_uuid_1;
 			$add_result = $access->add($_POST);
-
-			$emailKeyLink = "https://" . $_SERVER['SERVER_NAME'] . "/support/customer_portal/optoskand/?key=" . $access_uuid_1;
+			
+			//$emailKeyLink = "https://" . $_SERVER['SERVER_NAME'] . "/support/customer_portal/optoskand/?key=" . $access_uuid_1;
+			$emailKeyLink = "https://" . $_SERVER['SERVER_NAME'] . "/mfa/?key=" . $access_uuid_1. "&category=" . $category;
 			
 			// create html message
 			$message_html = ""
@@ -60,29 +63,75 @@ switch($action){
 				$response = $sendgrid->send( $email );
 			} catch ( Exception $e ) {
 				echo 'Caught exception: ' . $e->getMessage() . "\n";
+				
 			}
-			setcookie("COHR-OPTOSKAND",$access_uuid_1, time()+86400);
 			$response = $add_result;
 			
 		}
+		break;
+	case "auth":
+
+		$valid = false;
+		$valid_cookie = false;
+		$id = "";
+		$data = array();
+		//$data['access_uuid_1'] = $_POST['key'];
+		if(isset($_GET['key'])){
+			$data['access_uuid_1'] = $_GET['key'];
+		}elseif( isset($_POST['key']) ){
+			$data['access_uuid_1'] = $_POST['key'];
+		}elseif( isset($_COOKIE["COHR-OPTOSKAND"]) ){
+			$data['access_uuid_1'] = $_COOKIE["COHR-OPTOSKAND"];
+		}
+
+		$data['category'] = $_POST['category'];
+		$data['access_ip'] = $_SERVER['REMOTE_ADDR'];
+		if(isset($data['access_uuid_1'])){
+			$verify_auth_result = $access->verify_auth($data);
+			if( $verify_auth_result == true){
+				$response['valid'] = true;
+				//$response['content'] = htmlspecialchars(readfile("../../App_Constant/optoskand.html"));
+				$content = file_get_contents("../../App_Constant/optoskand.html");
+				$response['content'] = str_replace("\t","",$content);
+				$response['content'] = str_replace("\r\n","",$response['content']);
+
+			}else{
+				$response['valid'] = $valid;
+			}			
+		}else{
+			$response['valid'] = $valid;
+		}
+
 		break;
 	case "check_given_cookie":
 		$valid = false;
 		$valid_cookie = false;
 		$id = "";
-		$data = "";
-		$data['access_uuid_1'] = $_POST['key'];
+		$data = array();
+		//$data['access_uuid_1'] = $_POST['key'];
+		if(isset($_GET['key'])){
+			$data['access_uuid_1'] = $_GET['key'];
+		}elseif( isset($_POST['key']) ){
+			$data['access_uuid_1'] = $_POST['key'];
+		}elseif( isset($_COOKIE["COHR-OPTOSKAND"]) ){
+			$data['access_uuid_1'] = $_COOKIE["COHR-OPTOSKAND"];
+		}
+		
 		$data['category'] = $_POST['category'];
 		$data['access_ip'] = $_SERVER['REMOTE_ADDR'];
 		
 		$verify_auth_result = $access->verify_auth($data);
-
+		//print_r($data);
+//print "Auth: " . $verify_auth_result;
 		if( $verify_auth_result == true){
 			if(isset($_COOKIE["COHR-OPTOSKAND"])){
+				header("Location: /support/customer_portal/optoskand/");
 				$retrieve_cookie = $_COOKIE["COHR-OPTOSKAND"];
-				$given_cookie = $_POST['key']; 
+				//$given_cookie = $_POST['key']; 
+				$given_cookie =$data['access_uuid_1']; 
 				
 				if($given_cookie == $retrieve_cookie){
+					header("Location: /support/customer_portal/optoskand/");
 					$valid = true;
 					$id = $_COOKIE["COHR-OPTOSKAND"];
 				}
@@ -102,9 +151,45 @@ switch($action){
 			$response['id'] = $id;
 		
 		break;
+	default:
+		$valid = false;
+		$valid_cookie = false;
+		$id = "";
+		$data = array();
+		//$data['access_uuid_1'] = $_POST['key'];
+		if(isset($_GET['key'])){
+			$data['access_uuid_1'] = $_GET['key'];
+		}elseif( isset($_POST['key']) ){
+			$data['access_uuid_1'] = $_POST['key'];
+		}
+		if(isset($_COOKIE["COHR-OPTOSKAND"])){
+			$data['access_uuid_1'] = $_COOKIE["COHR-OPTOSKAND"];
+		}
+		
+		$data['category'] = $_GET['category'];
+		$data['access_ip'] = $_SERVER['REMOTE_ADDR'];
+		
+		$verify_auth_result = $access->verify_auth($data);
+
+		if( $verify_auth_result == true){
+			header("Location: /support/customer_portal/optoskand/");
+			if(isset($_COOKIE["COHR-OPTOSKAND"])){
+				$retrieved_cookie = $_COOKIE["COHR-OPTOSKAND"];
+				//$given_cookie = $_POST['key']; 
+				$given_cookie = $data['access_uuid_1']; 
+				
+				if($given_cookie == $retrieve_cookie){
+					header("Location: /support/customer_portal/optoskand/");
+					$valid = true;
+					$id = $_COOKIE["COHR-OPTOSKAND"];
+				}
+			}			
+		}
+
+		$response['valid'] = $valid;
+		break;
 
 }
-
 print json_encode($response);
 
 
