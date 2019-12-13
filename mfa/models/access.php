@@ -64,10 +64,16 @@ class Access extends Database {
 	* @return boolean $result
 	*/
 	public function verify_auth($data){
+
 		extract($data);
+
 		$user_ip = $_SERVER['REMOTE_ADDR'];
 		$query = "SELECT `access_ip`,`access_uuid_1`,`category`,`access_granted_datetime` FROM `".$this->portal_access."` WHERE `access_ip` = :access_ip AND `access_uuid_1` = :access_uuid_1 AND `category` = :category";
-
+		
+		$message = print_r($data,true) . "\r\n";
+		$message .= 'Query: ' . $query . "\r\n";
+		$log_file_name = 'model-access-' .time() . '.log'; 		
+		error_log($message, 3, $log_file_name);
 		$stmt = $this->conn->prepare($query);
 		$stmt->bindValue(':access_ip',$user_ip, PDO::PARAM_STR);
 		$stmt->bindValue(':access_uuid_1',$access_uuid_1, PDO::PARAM_STR);
